@@ -36,11 +36,18 @@ class DemoUtils {
 class HttpExtensions{
     public static function promise(h:Http,request = false, ?err:Dynamic->Dynamic){
         var p = new Promise<String>(err);
-        h.onError = p.reject;
         var set = false;
+        h.onError = function(err){
+            if (!set) {
+                set = true;
+                p.reject(err);                
+            }
+        }
         h.onData = function(x){
-            if (!set) p.resolve(x);
-            else set = true;
+            if (!set) {
+                set = true;
+                p.resolve(x);
+            }
         }
         h.request(request);
         return p;
